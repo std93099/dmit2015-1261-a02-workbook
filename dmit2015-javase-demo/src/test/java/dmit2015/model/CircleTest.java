@@ -2,33 +2,23 @@ package dmit2015.model;
 
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class CircleTest {
 
-    @Test
-    void area_whenRadiusIs5_returnsExpectedArea() {
-        // Arrange
+    @ParameterizedTest
+    @CsvSource({
+            "4, 50.27",
+            "5, 78.54"
+    })
+    void area_returnsExpectedArea(double radius, double expectedArea) {
         Circle circle = new Circle();
-        circle.setRadius(5);
+        circle.setRadius(radius);
 
-        // Act
-        double actual = circle.area();
-
-        // Assert
-        assertThat(actual).isCloseTo(78.54, within(0.01));
-    }
-
-    @Test
-    void area_whenRadiusIs4_returnsExpectedArea() {
-        // Arrange
-        Circle circle = new Circle();
-        circle.setRadius(4);
-
-        // Act
-        double actual = circle.area();
-
-        //Assert
-        assertThat(actual).isCloseTo(50.27, within(0.01));
+        assertThat(circle.area())
+                .isCloseTo(expectedArea, within(0.01));
     }
 
     @Test
@@ -44,5 +34,25 @@ class CircleTest {
         circle.setRadius(7);
 
         assertThat(circle.getRadius()).isEqualTo(7.0);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0, -5})
+    void setRadius_whenInvalid_throwsException(double invalidRadius) {
+        Circle circle = new Circle();
+
+        assertThatThrownBy(() -> circle.setRadius(invalidRadius))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void setRadius_whenInvalid_preservesPreviousRadius() {
+        Circle circle = new Circle();
+        circle.setRadius(4);
+
+        assertThatThrownBy(() -> circle.setRadius(-5))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(circle.getRadius()).isEqualTo(4.0);
     }
 }
